@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GoldTrader Pro — Pricing</title>
+<link rel="stylesheet" href="style.css">
+<meta name="color-scheme" content="dark light">
+<script>
+/* Apply saved theme early to avoid flash */
+try {
+  const pref = localStorage.getItem("themePreference") || "system";
+  if (pref === "system") {
+    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = sysDark ? "dark" : "light";
+  } else {
+    document.documentElement.dataset.theme = pref;
+  }
+} catch (e) {
+  document.documentElement.dataset.theme = "dark";
+}
+</script>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center">
+    <div class="brand">
+      <div class="logo">GT</div>
+      <div>
+        <div style="font-weight:700">GoldTrader Pro</div>
+        <div class="small">Invoicing & Inventory — simple, secure, professional</div>
+      </div>
+    </div>
+    <div class="role-group" style="margin-left:20px">
+      <label for="roleSelect" class="small">Access</label>
+      <select id="roleSelect" aria-label="Select access role">
+        <option value="tenant">Tenant</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="index.html"><button class="btn btn-ghost">Home</button></a>
+    <a href="pricing.html"><button class="btn btn-ghost">Pricing</button></a>
+    <a href="whatsapp_qr.html"><button class="btn btn-ghost">QR Generator</button></a>
+    <a href="contact.html"><button class="btn btn-ghost">Contact</button></a>
+  </div>
+
+  <div class="theme-controls">
+    <button id="themeBtn" class="btn btn-ghost" title="Toggle theme">🌙</button>
+  </div>
+
+  <!-- ✅ Hamburger menu on right -->
+  <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+    <span class="bar"></span>
+  </button>
+</header>
+
+<main class="container">
+  <div class="header-top-right"><a href="index.html"><button class="btn btn-ghost">Back to home</button></a></div>
+  <h2 class="pricing-title">Pricing</h2>
+  <p class="small">Flat annual subscription with GST applicable.</p>
+
+  <div style="margin-top:18px;max-width:880px">
+    <div class="plan-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--border);padding:14px;border-radius:10px">
+      <div class="plan-info">
+        <strong style="font-size:18px">GoldTrader Pro Plan</strong>
+        <div class="plan-price small">All features included · ₹2,500 + GST / annually</div>
+      </div>
+      <div>
+        <a href="contact.html"><button class="btn btn-primary">Contact Sales</button></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer" style="margin-top:28px">GoldTrader Pro — hosted at goldtraderpro.in <span id="year"></span></div>
+</main>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+<!-- Theme preference + toggle logic (same behavior as index) -->
+<script>
+(function () {
+  // safe theme helper — works whether or not #themePref exists
+  const prefSel = document.getElementById("themePref");
+  const btn = document.getElementById("themeBtn");
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    if (btn) btn.textContent = theme === "dark" ? "🌙" : "☀️";
+  }
+
+  function resolveAndApply(pref) {
+    if (pref === "system") {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      applyTheme(mq.matches ? "dark" : "light");
+    } else {
+      applyTheme(pref);
+    }
+  }
+
+  // read stored preference safely
+  const storedPref = (function () {
+    try { return localStorage.getItem("themePreference") || "system"; }
+    catch (e) { return "system"; }
+  })();
+
+  // initial apply
+  resolveAndApply(storedPref);
+
+  // if the select exists, wire it up; otherwise skip safely
+  if (prefSel) {
+    prefSel.value = storedPref;
+    prefSel.addEventListener("change", function () {
+      const v = prefSel.value;
+      try { localStorage.setItem("themePreference", v); } catch (e) {}
+      resolveAndApply(v);
+    });
+  }
+
+  // wire toggle button if present
+  if (btn) {
+    btn.addEventListener("click", function () {
+      const current = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+      const next = current === "dark" ? "light" : "dark";
+      try { localStorage.setItem("themePreference", next); } catch (e) {}
+      if (prefSel) prefSel.value = next;
+      resolveAndApply(next);
+    });
+  }
+
+  // respond to system changes only if preference==system
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  mq.addEventListener && mq.addEventListener('change', function () {
+    try {
+      if ((localStorage.getItem("themePreference") || "system") === "system") {
+        resolveAndApply("system");
+      }
+    } catch (e) { /* ignore */ }
+  });
+})();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const nav = document.querySelector('.nav');
+
+    if (!hamburger || !nav) {
+      // nothing to do on pages without the expected header structure
+      return;
+    }
+
+    // ensure aria attributes for accessibility
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-controls', 'main-nav');
+
+    // give nav an id if missing (helps aria-controls)
+    if (!nav.id) nav.id = 'main-nav';
+
+    // toggle function
+    const toggleNav = () => {
+      const isOpen = nav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', String(!!isOpen));
+      // trap focus could be added later — basic behavior for now
+    };
+
+    // attach click
+    hamburger.addEventListener('click', function (ev) {
+      ev.stopPropagation(); // don't let body click close immediately
+      toggleNav();
+    });
+
+    // close nav when clicking outside (mobile)
+    document.addEventListener('click', function (ev) {
+      if (!nav.classList.contains('open')) return;
+      // if click is inside nav or on hamburger, ignore
+      if (nav.contains(ev.target) || hamburger.contains(ev.target)) return;
+      nav.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
+
+    // close with Escape key
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.focus();
+      }
+    });
+
+    // Optional: auto-hide nav when window resizes to desktop
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 700 && nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  } catch (err) {
+    // log error cleanly — won't break other scripts
+    console.error('Hamburger init error:', err);
+  }
+});
+</script>
+</body>
+</html>

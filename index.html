@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>GoldTrader Pro — Home</title>
+<link rel="stylesheet" href="style.css">
+<meta name="color-scheme" content="dark light">
+<script>
+try {
+  const pref = localStorage.getItem("themePreference") || "system";
+  if (pref === "system") {
+    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = sysDark ? "dark" : "light";
+  } else {
+    document.documentElement.dataset.theme = pref;
+  }
+} catch(e) { document.documentElement.dataset.theme = "dark"; }
+</script>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center">
+    <div class="brand">
+      <div class="logo">GT</div>
+      <div>
+        <div style="font-weight:700">GoldTrader Pro</div>
+        <div class="small">Invoicing & Inventory — simple, secure, professional</div>
+      </div>
+    </div>
+    <div class="role-group" style="margin-left:20px">
+      <label for="roleSelect" class="small">Access</label>
+      <select id="roleSelect" aria-label="Select access role">
+        <option value="tenant">Tenant</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="pricing.html"><button class="btn btn-ghost">Pricing</button></a>
+    <a href="whatsapp_qr.html"><button class="btn btn-ghost">QR Generator</button></a>
+    <a href="contact.html"><button class="btn btn-ghost">Contact Us</button></a>
+  </div>
+
+  <div class="theme-controls">
+    <select id="themePref" class="theme-select" title="Theme preference" aria-label="Theme preference">
+      <option value="system">System</option>
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+    </select>
+    <button id="themeBtn" class="btn btn-ghost" title="Toggle theme">🌙</button>
+  </div>
+
+  <!-- ✅ Hamburger moved to right side -->
+  <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+    <span class="bar"></span>
+  </button>
+</header>
+
+<main class="container">
+  <section class="hero-card hero" id="landing">
+    <div>
+      <h1 style="margin:0 0 10px">Reliable invoicing & inventory for jewellers</h1>
+      <p class="small">Run your billing, manage customers, and control tenant access securely. Deploy on your server or on the mobile — ready-to-run invoice templates included.</p>
+      <div class="small">
+        <div>• Multi-Business support with Tenant roles.</div>
+        <div>• Invoice generation, customer & stock management, and reports extractions.</div>
+        <div>• Ready to extract sales and payment register for accounting and gst filling.</div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button id="ctaGetStarted" class="btn btn-primary">Get started</button>
+        <a href="pricing.html"><button id="ctaPricing" class="btn btn-ghost">Pricing</button></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="features">
+    <div class="feature">
+      <h4>Billing & Invoices</h4>
+      <p class="small muted">Create GST-ready invoices, save customers, and generate PDF bills.</p>
+    </div>
+    <div class="feature">
+      <h4>Dedicated Database</h4>
+      <p class="small muted">A dedicated database is maintained to store and manage all records systematically.</p>
+    </div>
+    <div class="feature">
+      <h4>Reports & Exports</h4>
+      <p class="small muted">Download reports, ledgers, and stock registers as Excel/PDF for accounting.</p>
+    </div>
+  </section>
+
+  <section id="showcase" class="section" style="display:block;margin-top:14px;padding:12px">
+    <h3>Showcase & Assets</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;align-items:flex-start">
+      <div style="flex:1 1 520px;min-width:260px;">
+        <div class="card-surface" style="border-radius:10px;overflow:hidden;border:1px solid var(--border);padding:10px">
+          <div id="carouselLarge" class="carousel-large"></div>
+          <div id="carouselThumbs" class="carousel-thumbs"></div>
+        </div>
+      </div>
+      <div style="flex:1 1 320px;min-width:220px;">
+        <div class="card-surface" style="border-radius:10px;padding:12px;border:1px solid var(--border)">
+          <h4 style="margin:0 0 6px">About this piece</h4>
+          <p class="small">Tracks karat purity, weight, and valuation across inventory. Issue GST-ready invoices and maintain ledger accuracy.</p>
+          <ul class="small" style="margin:8px 0 0;padding-left:18px">
+            <li>Karats: 22K / 18K</li>
+            <li>Weight tracking: grams / ct</li>
+            <li>Valuation history & audit log</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    (function(){
+      const ASSET_FILES = ['Temple_Jewellery.jpg','ring_closeup.jpg','store_front.jpg','product_grid.jpg'];
+      const large = document.getElementById('carouselLarge');
+      const thumbs = document.getElementById('carouselThumbs');
+      let current = 0;
+      let interval = null;
+
+      function createLargeImg(filename, idx){
+        const img = document.createElement('img');
+        img.src = 'assets/' + filename;
+        img.alt = filename;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.className = 'carousel-img';
+        img.dataset.idx = idx;
+        return img;
+      }
+
+      function createThumb(filename, idx){
+        const t = document.createElement('img');
+        t.src = 'assets/' + filename;
+        t.alt = filename;
+        t.loading = 'lazy';
+        t.className = 'thumb-img';
+        t.dataset.idx = idx;
+        t.addEventListener('click', () => showIndex(idx));
+        return t;
+      }
+
+      ASSET_FILES.forEach((f,i) => {
+        large.appendChild(createLargeImg(f,i));
+        thumbs.appendChild(createThumb(f,i));
+      });
+
+      const imgs = large.querySelectorAll('img');
+
+      function showIndex(idx){
+        if(idx < 0) idx = ASSET_FILES.length - 1;
+        if(idx >= ASSET_FILES.length) idx = 0;
+        imgs.forEach(img => img.style.opacity = (Number(img.dataset.idx) === idx) ? '1' : '0');
+        Array.from(thumbs.children).forEach(t => {
+          t.style.border = (Number(t.dataset.idx) === idx) ? '2px solid var(--accent)' : '2px solid transparent';
+        });
+        current = idx;
+      }
+
+      function startAutoplay(){
+        stopAutoplay();
+        interval = setInterval(() => { showIndex((current + 1) % ASSET_FILES.length); }, 3000);
+      }
+      function stopAutoplay(){ if(interval){ clearInterval(interval); interval = null; } }
+
+      large.addEventListener('mouseenter', stopAutoplay);
+      large.addEventListener('mouseleave', startAutoplay);
+      thumbs.addEventListener('mouseenter', stopAutoplay);
+      thumbs.addEventListener('mouseleave', startAutoplay);
+
+      showIndex(0);
+      startAutoplay();
+
+      imgs.forEach(img => img.onerror = () => img.style.display = 'none');
+      Array.from(thumbs.children).forEach(t => t.onerror = () => t.style.display = 'none');
+    })();
+    </script>
+  </section>
+
+
+  <section id="testimonials" class="section" style="margin-top:18px;padding:18px;border-radius:14px;">
+    <h3 style="margin-top:0">What our customers say</h3>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px">
+      <div style="flex:1 1 260px;padding:14px;border-radius:14px" class="card-surface"><strong>Uma jewellers</strong><div class="small">"GoldTrader Pro simplified our invoicing and reduced reconciliation time by 70%."</div></div>
+      <div style="flex:1 1 260px;padding:14px;border-radius:14px" class="card-surface"><strong>Royal Ornaments</strong><div class="small">"Accurate stock master and GST-ready PDFs made month-end a breeze."</div></div>
+      <div style="flex:1 1 260px;padding:14px;border-radius:14px" class="card-surface"><strong>Krishna Traders</strong><div class="small">"Excellent tenant separation and simple user management."</div></div>
+    </div>
+  </section>
+  
+  <section id="faq" class="section" style="margin-top:18px;padding:18px;border-radius:14px;">
+    <h3 style="margin-top:0">FAQ</h3>
+    <div style="margin-top:8px">
+      <div style="margin-bottom:12px"><strong>Q: Does it support GST invoices?</strong><br><span class="small">A: Yes — HSN, tax breakup and GST-ready PDFs are supported.</span></div>
+      <div style="margin-bottom:12px"><strong>Q: Can I exports multiple Reports?</strong><br><span class="small">A: Yes — multiple reports like sale register, payment register, customer master and stock movement etc.</span></div>
+      <div style="margin-bottom:12px"><strong>Q: Will sale register helpful for maintaing and filing gst return?</strong><br><span class="small">A: Yes - The sales register maintains an item-wise record for each invoice, capturing all relevant information required for accounting and GST return filing.</span></div>
+    </div>
+  </section>
+
+  <footer class="footer">GoldTrader Pro — hosted at goldtraderpro.in <span id="year"></span></footer>
+</main>
+
+<!-- qrious lib -->
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
+<script>
+(function(){
+  const phoneInput=document.getElementById('waPhone'),
+        msgInput=document.getElementById('waMessage'),
+        sizeRange=document.getElementById('waSize'),
+        sizeLabel=document.getElementById('waSizeLabel'),
+        generateBtn=document.getElementById('waGenerate'),
+        clearBtn=document.getElementById('waClear'),
+        downloadLink=document.getElementById('waDownload'),
+        canvas=document.getElementById('waCanvas'),
+        waLink=document.getElementById('waLink'),
+        waLinkWrap=document.getElementById('waLinkWrap');
+
+  let qr=new QRious({element:canvas,value:'',size:Number(sizeRange.value),level:'M'});
+  function isValidPhone(p){return /^\d{8,15}$/.test(p.trim());}
+  function buildWaLink(phone,msg){const base='https://wa.me/';return msg.trim()?base+phone+'?text='+encodeURIComponent(msg):base+phone;}
+  function updateSizeLabel(){sizeLabel.textContent=sizeRange.value;qr.size=Number(sizeRange.value);canvas.width=qr.size;canvas.height=qr.size;if(qr.value)qr.value=qr.value;}
+  sizeRange.addEventListener('input',updateSizeLabel);
+  generateBtn.addEventListener('click',()=>{
+    const p=phoneInput.value.trim(),m=msgInput.value||'';if(!isValidPhone(p)){alert('Invalid phone number.');return;}
+    const url=buildWaLink(p,m);qr.value=url;waLink.href=url;waLink.textContent=url;waLinkWrap.style.display='block';
+    setTimeout(()=>{const dataURL=canvas.toDataURL('image/png');downloadLink.href=dataURL;downloadLink.style.display='inline-block';},50);
+  });
+  clearBtn.addEventListener('click',()=>{qr.value='';waLinkWrap.style.display='none';downloadLink.style.display='none';canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);phoneInput.value='';msgInput.value='';});
+  phoneInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();generateBtn.click();}});
+  updateSizeLabel();
+})();
+</script>
+
+<script>
+(function(){
+  const ROLE_URLS={tenant:"http://localhost:8501",admin:"http://localhost:8502"};
+  document.addEventListener('DOMContentLoaded',function(){
+    document.getElementById('year').textContent=new Date().getFullYear();
+    const role=document.getElementById('roleSelect'),btn=document.getElementById('ctaGetStarted');
+    btn&&btn.addEventListener('click',()=>window.open(ROLE_URLS[role.value],'_blank'));
+  });
+})();
+</script>
+
+<script>
+(function(){
+  const prefSel=document.getElementById("themePref"),btn=document.getElementById("themeBtn");
+  function apply(t){document.documentElement.dataset.theme=t;btn.textContent=t==="dark"?"🌙":"☀️";}
+  function resolveAndApply(p){if(p==="system"){apply(window.matchMedia('(prefers-color-scheme: dark)').matches?"dark":"light");}else apply(p);}
+  const stored=localStorage.getItem("themePreference")||"system";prefSel.value=stored;resolveAndApply(stored);
+  prefSel.addEventListener("change",()=>{const v=prefSel.value;localStorage.setItem("themePreference",v);resolveAndApply(v);});
+  btn.addEventListener("click",()=>{const n=document.documentElement.dataset.theme==="dark"?"light":"dark";localStorage.setItem("themePreference",n);prefSel.value=n;resolveAndApply(n);});
+})();
+</script>
+<!-- ✅ Add this script at the very end -->
+<script>
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const nav = document.querySelector('.nav');
+  hamburgerBtn.addEventListener('click', () => {
+    nav.classList.toggle('open');
+  });
+</script>
+</body>
+</html>
