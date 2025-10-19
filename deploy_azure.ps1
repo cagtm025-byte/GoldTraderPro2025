@@ -1,36 +1,40 @@
-# deploy_azure.ps1 (filled)
-$RG = "GoldTrader Pro"
-$LOCATION = "CentralIndia"
-$PLAN = "GoldTrader Pro Plan"
-$APPNAME = "Goldtraderpro"
-$ZIP_PATH = ".\\GoldTrader.zip"
-$PY_RUNTIME = "PYTHON:3.11"
+<#
+deploy_azure.ps1
+Usage example:
+.\deploy_azure.ps1 -RG "GoldTraderPro-RG" -LOCATION "CentralIndia" -PLAN "GoldTraderPro-Plan" -APPNAME "goldtraderpro1234" -ZIP_PATH ".\GoldTraderPro2025.zip"
+#>
 
-Write-Output "Logging into Azure..."
-az login | Out-Null
+param(
+    [string]$RG = "goldtraderpro",
+    [string]$LOCATION = "Central US",
+    [string]$PLAN = "ASP-goldtraderpro-8ab2 (B1: 1)",
+    [string]$APPNAME = "goldtraderpro",
+    [string]$ZIP_PATH = "D:\Software\GoldTraderPro\GoldTraderPro2025.zip"
+)
 
-Write-Output "Creating resource group: $RG in $LOCATION"
-az group create --name $RG --location $LOCATION | Out-Null
+Write-Output "Resource group: $RG"
+Write-Output "Location: $LOCATION"
+Write-Output "App Service plan: $PLAN"
+Write-Output "App name: $APPNAME"
+Write-Output "Zip path: $ZIP_PATH"
 
-Write-Output "Creating App Service plan: $PLAN (Linux, SKU B1)"
-az appservice plan create --name $PLAN --resource-group $RG --sku B1 --is-linux | Out-Null
+# 1) Create resource group
+az group create --name $RG --location $LOCATION
 
-Write-Output "Creating web app: $APPNAME with runtime $PY_RUNTIME"
-az webapp create --resource-group $RG --plan $PLAN --name $APPNAME --runtime $PY_RUNTIME | Out-Null
+# 2) Create Linux App Service plan
+az appservice plan create --name $PLAN --resource-group $RG --sku B1 --is-linux
 
-Write-Output "Setting WEBSITES_PORT=8000"
-az webapp config appsettings set --resource-group $RG --name $APPNAME --settings WEBSITES_PORT=8000 | Out-Null
+# 3) Create the webapp using Python 3.11 runtime
+az webapp create --resource-group $RG --plan $PLAN --name $APPNAME --runtime "PYTHON:3.11"
 
-Write-Output "Setting startup command to run Streamlit"
-$STARTUP_CMD = 'python -m streamlit run Final/Final.py --server.port 8000 --server.address 0.0.0.0'
-az webapp config set --resource-group $RG --name $APPNAME --startup-file $STARTUP_CMD | Out-Null
+# 4) Set the port Azure will route to
+az webapp config appsettings set --resource-group $RG --name $APPNAME --settings WEBSITES_PORT=8501
 
-if (-Not (Test-Path $ZIP_PATH)) {
-    Write-Error ("ZIP file not found at {0}. Place {1} next to this script or update ZIP_PATH." -f $ZIP_PATH, "GoldTrader.zip")
-    exit 2
-}
+# 5) Configure startup file (startup.sh must exist in zip at root)
+az webapp config set --resource-group $RG --name $APPNAME --startup-file "startup.sh"
 
-Write-Output "Deploying $ZIP_PATH to $APPNAME ..."
-az webapp deployment source config-zip --resource-group $RG --name $APPNAME --src $ZIP_PATH | Out-Null
+# 6) Deploy via zip
+az webapp deployment source config-zip --resource-group $RG --name $APPNAME --src $ZIP_PATH
 
-Write-Output "Deployment finished. Visit: https://$APPNAME.azurewebsites.net"
+Write-Output "Deployment done. Tail logs with:"
+Write-Output "az webapp log tail --resource-group $RG --name $APPNAME"

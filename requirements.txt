@@ -1,0 +1,6 @@
+streamlit==1.50.0          # UI framework used by your app. (pypi release Sep 23, 2025)
+pandas==2.3.3              # Dataframes used by your app. (pypi release Sep 29, 2025)
+numpy==2.3.4               # Required by pandas; pin to avoid wheel mismatches.
+reportlab==4.4.4           # PDF generation (reportlab) used heavily in Final.py.
+passlib==1.7.4             # Password hashing (pbkdf2_sha256) used in tenants_auth.py
+altair==5.5.0              # Charting library (used if code imports altair)
