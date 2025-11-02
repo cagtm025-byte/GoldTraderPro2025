@@ -1258,6 +1258,9 @@ st.sidebar.markdown(
     unsafe_allow_html=True,
 )
 
+import streamlit as st
+from urllib.parse import quote
+
 # ---------------- Menu Buttons ----------------
 menu_options = [
     ("📊", "Dashboard"),
@@ -1265,50 +1268,35 @@ menu_options = [
     ("🛒", "Report & Register"),
     ("💳", "Payments Ledger"),
     ("📦", "Stock Master"),
+    ("🏢","Company Settings"),
 ]
 
 menu_html = "<div class='menu-container'>"
 for emoji, label in menu_options:
     selected = "selected" if st.session_state.get("page") == label else ""
     href = f"?page={quote(label)}"
-    # Open in same tab without losing formatting
-    menu_html += (
-        f"<a class='menu-link' href='{href}' target='_self' "
-        f"onclick=\"event.preventDefault(); window.location.search='{href}';\">"
-        f"  <div class='menu-item {selected}'>"
-        f"    <div class='menu-emoji'>{emoji}</div>"
-        f"    <div class='menu-label'>{label}</div>"
-        f"  </div>"
-        f"</a>"
-    )
-menu_html += "</div>"
-st.sidebar.markdown(menu_html, unsafe_allow_html=True)
+    
+    # Button using st.sidebar.button for functionality, while updating session state.
+    if st.sidebar.button(f"{emoji} {label}", key=f"btn_{label}"):
+        st.session_state["page"] = label
+        
+        
+    # Reliable Logout button (handled here, not as a 'page')
+if st.sidebar.button("🔓 Logout", key="btn_logout"):
+    # keys to remove on logout
+    for k in ["username","user_id","tenant_id","role", "page", "invoice_items", "draft_invoice_no"]:
+        if k in st.session_state:
+            del st.session_state[k]
+    # try a safe rerun
+    try:
+        st.experimental_rerun()
+    except Exception:
+        try:
+            st.rerun()
+        except Exception:
+            pass
 
-# ---------------- Divider + Profile Buttons ----------------
-st.sidebar.markdown("<div class='menu-divider'></div>", unsafe_allow_html=True)
-
-profile_html = f"""
-    <div class='profile-dropdown'>
-        <a class='profile-action' href='?page={quote("Company Settings")}' target='_self'
-           onclick="event.preventDefault(); window.location.search='?page={quote("Company Settings")}';">
-            <div class='profile-item'>
-                <div class='profile-emoji'>🏢</div>
-                <div class='profile-label'>Company Settings</div>
-            </div>
-        </a>
-        <a class='profile-action' href='?action=logout' target='_self'
-           onclick="event.preventDefault(); window.location.search='?action=logout';">
-            <div class='profile-item'>
-                <div class='profile-emoji'>🔓</div>
-                <div class='profile-label'>Logout</div>
-            </div>
-        </a>
-    </div>
-"""
-st.sidebar.markdown(profile_html, unsafe_allow_html=True)
-
-# ---------------- Footer ----------------
-st.sidebar.markdown("<div class='sidebar-footer'>@ hosted at <strong>goldtraderpro.in</strong></div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div style='margin-top:12px; font-size:14px; color:#6b7280;'>@ hosted at www.goldtraderpro.in</div>", unsafe_allow_html=True)
 
 # ---------------- Header (Main Page) ----------------
 st.markdown(
